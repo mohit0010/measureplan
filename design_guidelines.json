@@ -1,0 +1,156 @@
+{
+  "typography": {
+    "strategy": "The 'Old Money Tech' & 'Swiss Brutalist' Hybrid",
+    "fonts": {
+      "headings": {
+        "family": "Cabinet Grotesk",
+        "fallback": "sans-serif",
+        "description": "Used for all H1-H4. Delivers an architectural, structural, and professional tone.",
+        "weights": ["bold", "black"]
+      },
+      "body": {
+        "family": "IBM Plex Sans",
+        "fallback": "sans-serif",
+        "description": "Used for data, labels, and paragraphs. Highly legible, technical, and precise (similar to CAD software interfaces).",
+        "weights": ["regular", "medium", "semibold"]
+      },
+      "mono": {
+        "family": "IBM Plex Mono",
+        "fallback": "monospace",
+        "description": "Used for measurements, dimensions, confidence scores, and raw data display."
+      }
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-muted-foreground",
+      "overline": "text-xs uppercase tracking-[0.2em] font-semibold"
+    },
+    "banned_fonts": ["Inter", "Roboto", "Open Sans", "Lato", "Space Grotesk"]
+  },
+  "colors": {
+    "strategy": "Swiss & High-Contrast (Authority, Clarity, Truth) + Technical SaaS",
+    "light_mode": {
+      "background": "#FFFFFF",
+      "surface": "#F9FAFB",
+      "border": "#E5E7EB",
+      "text_primary": "#0A0A0A",
+      "text_secondary": "#52525B",
+      "primary": "#2563EB",
+      "primary_hover": "#1D4ED8",
+      "accent_walls": "#3B82F6",
+      "accent_doors": "#22C55E",
+      "accent_windows": "#F97316",
+      "accent_bathrooms": "#A855F7",
+      "accent_rooms": "#94A3B8"
+    },
+    "dark_mode": {
+      "background": "#09090B",
+      "surface": "#121214",
+      "border": "#27272A",
+      "text_primary": "#FAFAFA",
+      "text_secondary": "#A1A1AA",
+      "primary": "#3B82F6",
+      "primary_hover": "#60A5FA",
+      "accent_walls": "#60A5FA",
+      "accent_doors": "#4ADE80",
+      "accent_windows": "#FB923C",
+      "accent_bathrooms": "#C084FC",
+      "accent_rooms": "#475569"
+    }
+  },
+  "visual_enhancers": {
+    "surfaces": {
+      "cards": "Solid background, 1px subtle inner border (border-border), max 8px border-radius (rounded-md), subtle diffuse shadow. No heavy neumorphism to maintain technical clarity.",
+      "headers": "Crystal Glassmorphism. High opacity (bg-white/70 or bg-black/60), heavy blur (backdrop-blur-xl), 1px bottom border.",
+      "toolbars": "Floating glass panels (Linear style) positioned over the viewer. Heavy blur, high contrast icons."
+    },
+    "borders": "Expose the skeleton. Use 'Grid Borders' concept for data-heavy sections (border-r border-b on grid items) to simulate a blueprint framework.",
+    "shadows": {
+      "sm": "shadow-sm",
+      "md": "shadow-[0_8px_32px_rgba(0,0,0,0.08)]",
+      "hover": "shadow-lg translate-y-[-1px]"
+    }
+  },
+  "components": {
+    "buttons": "Sharp or slightly rounded (rounded-md). Solid primary colors for main CTA. Use subtle gray backgrounds with bold text for secondary actions. Always define explicit hover states (lighter hue/transform).",
+    "statistic_cards": "Bento Grid compatible. Large numeric values (IBM Plex Mono). Subtle progress bars or sparklines using the primary color.",
+    "interactive_viewer": "100% width/height canvas area with crosshair cursor. SVG overlays must use sharp vector rendering. Hovering over a detected object (e.g., Door) brightens its stroke and shows a high-contrast tooltip.",
+    "file_upload_dropzone": "Dashed border with active drag-over state. Inside, use a blueprint or grid pattern texture. Include clear upload progress bars (linear or circular) indicating OpenCV/OCR analysis pipeline steps.",
+    "toolbars": "Floating manual correction toolbar (Edit Mode). Vertical or horizontal pill shape. Tooltips on every icon."
+  },
+  "grids": {
+    "dashboard": {
+      "type": "High Density Grid (Bento)",
+      "base": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4",
+      "gap": "gap-4 or gap-6",
+      "rules": "Every pixel utilized. Use h-full on children. No jagged bottoms."
+    },
+    "marketing": {
+      "type": "The 'Tetris' Grid",
+      "base": "grid-cols-1 md:grid-cols-8 lg:grid-cols-12",
+      "gap": "gap-8 to gap-12",
+      "rules": "Asymmetry. Leave breathing room. Use spanning (col-span-8, col-span-4)."
+    }
+  },
+  "layouts": {
+    "homepage": "Hero section with large headline, subheadline, and dual CTA (Upload PDF vs View Demo). Asymmetric grid featuring a product mockup image on the right/bottom.",
+    "dashboard_view": "Sticky top navbar. Main content area split: Left 75% = Interactive Plan Viewer canvas, Right 25% = Scrollable details panel and Edit Mode toggles. Below canvas = horizontal row of large statistic cards."
+  },
+  "motion": {
+    "strategy": "Minimalist, Technical, and Fast",
+    "interactions": "Micro-interactions for feedback. Hover states on cards: transition: transform 0.2s ease, box-shadow 0.2s ease.",
+    "page_transitions": "Instant or very fast fade (150ms). Speed is a design material.",
+    "viewer": "Smooth zooming/panning (using framer-motion or d3-zoom). Objects animate in via staggered opacity when analysis is complete."
+  },
+  "accessibility": {
+    "contrast": "Minimum 4.5:1 for standard text. Never use pure transparent backgrounds over content. Focus states must have high contrast rings (focus:ring-2 focus:ring-primary).",
+    "aria": "Include aria-labels for all toolbar icons. Tooltips must be accessible.",
+    "data_testid": "ALL interactive and key informational elements MUST include a data-testid attribute in kebab-case, role-based format (e.g., 'upload-dropzone', 'stat-card-total-area', 'tool-add-wall')."
+  },
+  "media": {
+    "icons": {
+      "library": "lucide-react or @phosphor-icons/react (Duotone or Regular for technical feel)",
+      "usage": "Use crisp, consistent stroke widths. No emojis."
+    },
+    "image_urls": [
+      {
+        "category": "Hero Background / Blueprint Texture",
+        "url": "https://images.pexels.com/photos/4458210/pexels-photo-4458210.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "High-resolution close-up of an architectural floor plan for the hero section or dropzone background."
+      },
+      {
+        "category": "Marketing Context / Professional Context",
+        "url": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHwyfHxlbmdpbmVlciUyMHdvcmtpbmclMjBtb2Rlcm4lMjBjb25zdHJ1Y3Rpb258ZW58MHx8fHwxNzgzODQ0NDE3fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Architect working on a draft. Good for testimonial or 'Built for professionals' section."
+      }
+    ],
+    "3d_libraries": {
+      "recommendation": "Not strictly required for 2D floor plans, but if layered visualization (e.g., floor layers) is needed, use D3.js or React Spring Parallax for 2.5D separation of detected layers."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Prioritize a strict, engineering-grade visual hierarchy. Avoid overly playful shadows or bouncy animations.",
+    "Implement Shadcn/UI for foundational components but strip away the default Vercel-look by enforcing the 'Cabinet Grotesk / IBM Plex' typography and 1px technical borders.",
+    "Ensure dark mode is a first-class citizen, utilizing slate/obsidian grays, not pure black.",
+    "For the plan viewer canvas, use SVG overlays over the uploaded image. Map the specific colors mentioned in the color palette (accent_walls, accent_doors, etc.) to the SVG strokes.",
+    "Statistic cards must prominently feature numbers in IBM Plex Mono to emulate technical data readouts.",
+    "Include a floating action bar for the 'Edit Mode' (Linear style toolbars)."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid the 'AI slop' aesthetic. Make creative, distinctive frontends.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts. Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky navs and toolbars.",
+    "You MUST NOT apply universal transition. Eg: transition: all. Always add transitions for specific interactive elements excluding transforms.",
+    "You MUST NOT center align the app container. No .App { text-align: center; }.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Add 'data-testid' to ALL interactive elements for E2E testing reliability.",
+    "Use 'sonner' for toast notifications (e.g., 'Analysis Complete')."
+  ]
+}

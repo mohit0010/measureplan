@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------------------
+   PlanMeasure AI — Design tokens
+   Cabinet Grotesk + IBM Plex Sans/Mono, Blueprint aesthetic
+   ------------------------------------------------------- */
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&f[]=general-sans@600,500,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 221 83% 53%;              /* #2563EB */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+
+    --wall-color: #3b82f6;
+    --door-color: #22c55e;
+    --window-color: #f97316;
+    --bathroom-color: #a855f7;
+    --room-color: #94a3b8;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 6% 6%;             /* #09090B */
+    --foreground: 0 0% 98%;
+    --card: 240 6% 7%;                    /* #121214 */
+    --card-foreground: 0 0% 98%;
+    --popover: 240 6% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217 91% 60%;              /* brighter blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 4% 12%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 217 91% 60%;
+
+    --wall-color: #60a5fa;
+    --door-color: #4ade80;
+    --window-color: #fb923c;
+    --bathroom-color: #c084fc;
+    --room-color: #64748b;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01" on, "cv11" on;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: "Cabinet Grotesk", "General Sans", ui-sans-serif, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  .font-display { font-family: "Cabinet Grotesk", ui-sans-serif, sans-serif; letter-spacing: -0.02em; }
+  .font-mono-plex { font-family: "IBM Plex Mono", ui-monospace, monospace; font-feature-settings: "zero" on; }
+  .font-sans-plex { font-family: "IBM Plex Sans", ui-sans-serif, sans-serif; }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Blueprint grid background */
+.bp-grid {
+  background-image:
+    linear-gradient(hsl(var(--border) / 0.7) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.7) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.bp-grid-sm {
+  background-image:
+    linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.bp-grid-dot {
+  background-image: radial-gradient(hsl(var(--border) / 0.9) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Glass surface */
+.glass {
+  background: hsl(var(--background) / 0.7);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.dark .glass {
+  background: hsl(240 6% 6% / 0.72);
+}
+
+/* Overline tag */
+.overline {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Stat card number */
+.stat-num {
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+  border: 2px solid hsl(var(--background));
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.6); }
+
+/* SVG overlay strokes */
+.overlay-wall-external { stroke: var(--wall-color); stroke-width: 3; fill: none; opacity: 0.9; }
+.overlay-wall-internal { stroke: var(--wall-color); stroke-width: 2; fill: none; opacity: 0.65; stroke-dasharray: 6 4; }
+.overlay-door         { stroke: var(--door-color);  stroke-width: 2; fill: var(--door-color); fill-opacity: 0.18; }
+.overlay-window       { stroke: var(--window-color); stroke-width: 2; fill: var(--window-color); fill-opacity: 0.16; }
+.overlay-bathroom     { stroke: var(--bathroom-color); stroke-width: 2; fill: var(--bathroom-color); fill-opacity: 0.12; stroke-dasharray: 3 3; }
+.overlay-room         { stroke: var(--room-color); stroke-width: 1; fill: var(--room-color); fill-opacity: 0.02; }
+.overlay-hit { transition: filter 0.15s ease, stroke-width 0.15s ease; cursor: pointer; }
+.overlay-hit:hover { filter: brightness(1.35) drop-shadow(0 0 6px currentColor); stroke-width: 3.5; }
+
+.plan-canvas-cursor { cursor: crosshair; }
+
+/* Hide default file input */
+input[type="file"].plain-hidden { position: absolute; opacity: 0; pointer-events: none; }
+
+/* Drag-over dropzone */
+.dropzone-active {
+  border-color: hsl(var(--primary)) !important;
+  background: hsl(var(--primary) / 0.06);
+  transform: translateY(-1px);
+}
+
+/* Subtle grain for hero */
+.grain::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06  0 0 0 0 0.06  0 0 0 0 0.06  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Motion */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fade-in-up 0.4s ease-out both; }
+
+@keyframes scanline {
+  0%   { transform: translateY(-10%); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(110%); opacity: 0; }
+}
+.scanline {
+  position: absolute; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  animation: scanline 1.6s ease-in-out infinite;
+}

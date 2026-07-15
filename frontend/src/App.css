@@ -1,0 +1,4 @@
+/* PlanMeasure AI — global overrides only. Do NOT center-align App. */
+.App {
+  min-height: 100vh;
+}
