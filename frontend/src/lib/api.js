@@ -1,6 +1,14 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
+
+if (!BACKEND_URL) {
+  console.warn(
+    "[PlanMeasure] REACT_APP_BACKEND_URL not set — API calls will use same-origin. " +
+    "Set this env var in Vercel dashboard to your backend URL (e.g. https://your-backend.vercel.app)"
+  );
+}
+
 export const API_BASE = `${BACKEND_URL}/api`;
 
 export const api = axios.create({ baseURL: API_BASE });

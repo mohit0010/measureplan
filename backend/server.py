@@ -41,12 +41,24 @@ logger = logging.getLogger("planmeasure")
 
 
 # --------------------------------------------------------------------------
-# MongoDB
+# MongoDB (lazy init — avoids crash if env vars missing at import time)
 # --------------------------------------------------------------------------
-mongo_url = os.environ["MONGO_URL"]
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
-analyses_col = db["analyses"]
+_mongo_client = None
+_mongo_db = None
+_analyses_col = None
+
+
+def _get_mongo():
+    global _mongo_client, _mongo_db, _analyses_col
+    if _analyses_col is None:
+        mongo_url = os.environ.get("MONGO_URL", "")
+        if not mongo_url:
+            raise HTTPException(503, "MONGO_URL not configured")
+        db_name = os.environ.get("DB_NAME", "planmeasure")
+        _mongo_client = AsyncIOMotorClient(mongo_url)
+        _mongo_db = _mongo_client[db_name]
+        _analyses_col = _mongo_db["analyses"]
+    return _analyses_col
 
 # --------------------------------------------------------------------------
 # App
@@ -339,7 +351,7 @@ async def analyze(file: UploadFile = File(...), mode: str = "auto",
         "preview_b64": pages_docs[0]["preview_b64"],
         "pages": pages_docs,
     }
-    await analyses_col.insert_one(doc)
+    await _get_mongo().insert_one(doc)
 
     resp = _bd_to_response(aggregate, doc)
     resp["analysis_mode"] = used_mode
@@ -350,7 +362,7 @@ async def analyze(file: UploadFile = File(...), mode: str = "auto",
 
 @api.get("/analysis/{aid}")
 async def get_analysis(aid: str):
-    doc = await analyses_col.find_one(
+    doc = await _get_mongo().find_one(
         {"id": aid},
         # exclude heavy preview blobs; include only page data metadata
         {"_id": 0, "preview_b64": 0, "pages.preview_b64": 0},
@@ -363,7 +375,7 @@ async def get_analysis(aid: str):
 
 @api.get("/analysis/{aid}/pages/{n}")
 async def get_page_analysis(aid: str, n: int):
-    doc = await analyses_col.find_one(
+    doc = await _get_mongo().find_one(
         {"id": aid},
         {"_id": 0, "preview_b64": 0, "pages.preview_b64": 0},
     )
@@ -383,7 +395,7 @@ async def get_page_analysis(aid: str, n: int):
 
 @api.get("/analysis/{aid}/pages/{n}/preview")
 async def get_page_preview(aid: str, n: int):
-    doc = await analyses_col.find_one({"id": aid}, {"_id": 0})
+    doc = await _get_mongo().find_one({"id": aid}, {"_id": 0})
     if not doc:
         raise HTTPException(404, "Analysis not found")
     pages = doc.get("pages") or []
@@ -403,7 +415,7 @@ async def get_page_preview(aid: str, n: int):
 
 @api.get("/analysis/{aid}/preview")
 async def get_preview(aid: str):
-    doc = await analyses_col.find_one({"id": aid}, {"_id": 0, "preview_b64": 1})
+    doc = await _get_mongo().find_one({"id": aid}, {"_id": 0, "preview_b64": 1})
     if not doc:
         raise HTTPException(404, "Analysis not found")
     b64 = doc.get("preview_b64", "")
@@ -419,7 +431,7 @@ async def update_analysis(aid: str, body: AnalysisUpdate, page: int = 0):
     """Apply manual corrections (edit mode) to a specific page (default 0).
     Recomputes counts + wall lengths for that page and re-aggregates.
     """
-    doc = await analyses_col.find_one({"id": aid}, {"_id": 0, "preview_b64": 0,
+    doc = await _get_mongo().find_one({"id": aid}, {"_id": 0, "preview_b64": 0,
                                                      "pages.preview_b64": 0})
     if not doc:
         raise HTTPException(404, "Analysis not found")
@@ -455,7 +467,7 @@ async def update_analysis(aid: str, body: AnalysisUpdate, page: int = 0):
         pages[page]["data"] = target_bd.to_dict()
         doc["pages"] = pages
         agg = _reaggregate(doc)
-        await analyses_col.update_one(
+        await _get_mongo().update_one(
             {"id": aid},
             {"$set": {
                 f"pages.{page}.data": target_bd.to_dict(),
@@ -465,7 +477,7 @@ async def update_analysis(aid: str, body: AnalysisUpdate, page: int = 0):
         )
         return _bd_to_response(target_bd, doc, page_index=page)
     # Legacy single-page path
-    await analyses_col.update_one(
+    await _get_mongo().update_one(
         {"id": aid},
         {"$set": {"data": target_bd.to_dict(), "updated_at": _now_iso()}},
     )
@@ -475,7 +487,7 @@ async def update_analysis(aid: str, body: AnalysisUpdate, page: int = 0):
 
 @api.get("/analyses", response_model=List[AnalysisSummary])
 async def list_analyses():
-    cursor = analyses_col.find({}, {"_id": 0, "preview_b64": 0}).sort("created_at", -1).limit(50)
+    cursor = _get_mongo().find({}, {"_id": 0, "preview_b64": 0}).sort("created_at", -1).limit(50)
     out: List[AnalysisSummary] = []
     async for d in cursor:
         data = d.get("data", {})
@@ -498,7 +510,7 @@ async def list_analyses():
 
 @api.delete("/analysis/{aid}")
 async def delete_analysis(aid: str):
-    r = await analyses_col.delete_one({"id": aid})
+    r = await _get_mongo().delete_one({"id": aid})
     if r.deleted_count == 0:
         raise HTTPException(404, "Analysis not found")
     return {"deleted": True}
@@ -507,7 +519,7 @@ async def delete_analysis(aid: str):
 @api.post("/analysis/{aid}/calibrate")
 async def calibrate(aid: str, body: CalibrationRequest, page: int = 0):
     """Apply a user-drawn scale calibration to a specific page (default 0)."""
-    doc = await analyses_col.find_one({"id": aid}, {"_id": 0, "preview_b64": 0,
+    doc = await _get_mongo().find_one({"id": aid}, {"_id": 0, "preview_b64": 0,
                                                      "pages.preview_b64": 0})
     if not doc:
         raise HTTPException(404, "Analysis not found")
@@ -534,7 +546,7 @@ async def calibrate(aid: str, body: CalibrationRequest, page: int = 0):
         pages[page]["data"] = bd.to_dict()
         doc["pages"] = pages
         agg = _reaggregate(doc)
-        await analyses_col.update_one(
+        await _get_mongo().update_one(
             {"id": aid},
             {"$set": {
                 f"pages.{page}.data": bd.to_dict(),
@@ -543,7 +555,7 @@ async def calibrate(aid: str, body: CalibrationRequest, page: int = 0):
             }},
         )
         return _bd_to_response(bd, doc, page_index=page)
-    await analyses_col.update_one(
+    await _get_mongo().update_one(
         {"id": aid},
         {"$set": {"data": bd.to_dict(), "updated_at": _now_iso()}},
     )
@@ -553,7 +565,7 @@ async def calibrate(aid: str, body: CalibrationRequest, page: int = 0):
 
 @api.get("/analysis/{aid}/report")
 async def download_report(aid: str):
-    doc = await analyses_col.find_one({"id": aid}, {"_id": 0})
+    doc = await _get_mongo().find_one({"id": aid}, {"_id": 0})
     if not doc:
         raise HTTPException(404, "Analysis not found")
 
@@ -611,4 +623,5 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if _mongo_client:
+        _mongo_client.close()

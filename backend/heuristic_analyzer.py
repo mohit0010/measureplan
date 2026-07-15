@@ -19,7 +19,12 @@ from PIL import Image
 
 try:
     import pytesseract  # type: ignore
-    _OCR_AVAILABLE = True
+    # Verify the binary is actually available (not just the Python wrapper)
+    try:
+        pytesseract.get_tesseract_version()
+        _OCR_AVAILABLE = True
+    except Exception:
+        _OCR_AVAILABLE = False
 except Exception:
     _OCR_AVAILABLE = False
 
