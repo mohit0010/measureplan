@@ -92,6 +92,11 @@
     "tailwindcss": "3.4.17"
   },
 
+  "overrides": {
+    "ajv": "^8.9.0",
+    "ajv-keywords": "^5.0.0"
+  },
+
   "resolutions": {
     "react-router": "7.15.0",
     "node-forge": "1.4.0",
