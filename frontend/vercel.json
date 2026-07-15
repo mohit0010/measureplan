@@ -12,7 +12,10 @@
   ],
   "build": {
     "env": {
-      "NODE_VERSION": "18"
+      "NODE_VERSION": "18",
+      "ENABLE_EXPERIMENTAL_COREPACK": "1"
     }
-  }
+  },
+  "installCommand": "yarn install",
+  "buildCommand": "yarn build"
 }
