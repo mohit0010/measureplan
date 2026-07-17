@@ -55,6 +55,10 @@ def _get_mongo():
         if not mongo_url:
             raise HTTPException(503, "MONGO_URL not configured")
         db_name = os.environ.get("DB_NAME", "planmeasure")
+        # Sanitize: strip whitespace, remove dots/invalid chars
+        db_name = db_name.strip().replace(".", "_").replace("/", "_")
+        if not db_name:
+            db_name = "planmeasure"
         _mongo_client = AsyncIOMotorClient(mongo_url)
         _mongo_db = _mongo_client[db_name]
         _analyses_col = _mongo_db["analyses"]

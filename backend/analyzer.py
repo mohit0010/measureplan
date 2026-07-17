@@ -245,29 +245,20 @@ def _extract_json(text: str) -> Dict[str, Any]:
 async def llm_analyze(png_bytes: bytes, session_id: str, cv_hint: Dict[str, Any],
                       model_name: str = DEFAULT_MODEL) -> Dict[str, Any]:
     """Run Gemini vision analysis and return parsed JSON dict."""
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
 
     key = _get_api_key()
     if not key:
         raise RuntimeError("GOOGLE_API_KEY not configured")
 
-    genai.configure(api_key=key)
-
     # Resolve model name
     resolved_model = AVAILABLE_MODELS.get(model_name, model_name)
 
-    # Build the model with system instruction
-    model = genai.GenerativeModel(
-        model_name=resolved_model,
-        system_instruction=_SYSTEM_PROMPT,
-    )
+    client = genai.Client(api_key=key)
 
     # Prepare image
     b64 = base64.b64encode(png_bytes).decode("ascii")
-    image_part = {
-        "mime_type": "image/png",
-        "data": b64,
-    }
 
     hint_text = ""
     if cv_hint:
@@ -279,9 +270,19 @@ async def llm_analyze(png_bytes: bytes, session_id: str, cv_hint: Dict[str, Any]
 
     prompt = "Analyze this floor plan and return the strict JSON per system spec." + hint_text
 
-    response = await model.generate_content_async(
-        [prompt, image_part],
-        generation_config=genai.types.GenerationConfig(
+    response = await client.aio.models.generate_content(
+        model=resolved_model,
+        contents=[
+            types.Content(
+                role="user",
+                parts=[
+                    types.Part.from_text(prompt),
+                    types.Part.from_bytes(data=png_bytes, mime_type="image/png"),
+                ],
+            ),
+        ],
+        config=types.GenerateContentConfig(
+            system_instruction=_SYSTEM_PROMPT,
             temperature=0.1,
             max_output_tokens=8192,
         ),
