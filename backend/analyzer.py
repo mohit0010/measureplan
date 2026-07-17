@@ -221,7 +221,7 @@ Rules:
 
 
 def _extract_json(text: str) -> Dict[str, Any]:
-    """Best-effort JSON extraction from LLM response."""
+    """Best-effort JSON extraction from LLM response, with truncation repair."""
     # Strip common markdown fences
     t = text.strip()
     t = re.sub(r"^```(?:json)?", "", t).strip()
@@ -237,6 +237,24 @@ def _extract_json(text: str) -> Dict[str, Any]:
     if start != -1 and end != -1 and end > start:
         try:
             return json.loads(t[start:end + 1])
+        except Exception:
+            pass
+    # Truncated response: try to repair by closing open brackets/strings
+    if start != -1:
+        chunk = t[start:]
+        # Remove trailing incomplete string/value
+        chunk = re.sub(r',\s*"[^"]*$', '', chunk)
+        chunk = re.sub(r':\s*"[^"]*$', '', chunk)
+        # Count open braces/brackets and close them
+        opens = chunk.count("{") - chunk.count("}")
+        brackets = chunk.count("[") - chunk.count("]")
+        # Close any trailing array or object
+        if brackets > 0:
+            chunk += "]" * brackets
+        if opens > 0:
+            chunk += "}" * opens
+        try:
+            return json.loads(chunk)
         except Exception:
             pass
     return {}
@@ -276,7 +294,7 @@ async def llm_analyze(png_bytes: bytes, session_id: str, cv_hint: Dict[str, Any]
         config=types.GenerateContentConfig(
             system_instruction=_SYSTEM_PROMPT,
             temperature=0.1,
-            max_output_tokens=8192,
+            max_output_tokens=65536,
         ),
     )
 
