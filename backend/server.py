@@ -355,7 +355,10 @@ async def analyze(file: UploadFile = File(...), mode: str = "auto",
         "preview_b64": pages_docs[0]["preview_b64"],
         "pages": pages_docs,
     }
-    await _get_mongo().insert_one(doc)
+    try:
+        await _get_mongo().insert_one(doc)
+    except Exception as e:
+        logger.warning("MongoDB insert failed (%s) — returning result without persistence", e)
 
     resp = _bd_to_response(aggregate, doc)
     resp["analysis_mode"] = used_mode
