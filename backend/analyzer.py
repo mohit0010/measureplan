@@ -257,9 +257,6 @@ async def llm_analyze(png_bytes: bytes, session_id: str, cv_hint: Dict[str, Any]
 
     client = genai.Client(api_key=key)
 
-    # Prepare image
-    b64 = base64.b64encode(png_bytes).decode("ascii")
-
     hint_text = ""
     if cv_hint:
         hint_text = (
@@ -270,17 +267,12 @@ async def llm_analyze(png_bytes: bytes, session_id: str, cv_hint: Dict[str, Any]
 
     prompt = "Analyze this floor plan and return the strict JSON per system spec." + hint_text
 
+    # Open image as PIL for the SDK
+    img = Image.open(io.BytesIO(png_bytes))
+
     response = await client.aio.models.generate_content(
         model=resolved_model,
-        contents=[
-            types.Content(
-                role="user",
-                parts=[
-                    types.Part.from_text(prompt),
-                    types.Part.from_bytes(data=png_bytes, mime_type="image/png"),
-                ],
-            ),
-        ],
+        contents=[prompt, img],
         config=types.GenerateContentConfig(
             system_instruction=_SYSTEM_PROMPT,
             temperature=0.1,
